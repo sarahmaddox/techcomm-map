@@ -214,16 +214,23 @@
     });
 
     // Show an info window when the user clicks the marker.
-    marker.addListener('click', showInfoWindow);
+    marker.addListener('click', showInfoWindowAndZoomIn);
+
+    // Show an info window when the mouse hovers the marker.
+    marker.addListener('mouseover', showInfoWindow);
+
+    // Close the info window when the mouse leaves the marker.
+    marker.addListener('mouseout', closeInfoWindow);
 
     // Add the item to the array of items.
     itemInfo.marker = marker;
     techCommItems.push(itemInfo);
   }
 
-  // Show the tech comm info in a popup window.
-  function showInfoWindow() {
-    var marker = this;
+  // Create a popup window containing the tech comm info.
+  function createInfoWindow(marker) {
+    // var marker = this;
+    // alert (marker);
     infoWindow.setPosition(marker.getPosition());
     infoWindow.setContent('No information found');
     for (var i = 0; i < techCommItems.length; i++) {
@@ -249,14 +256,41 @@
         infoWindow.setContent(content);
       }
     }
+  }
+
+  // Show the popup window.
+  function showInfoWindow() {
+    // Create info window
+    createInfoWindow(this);
+
+    // Open the info window.
+    infoWindow.open(map, this);
+  }
+
+  // Show the popup window and zoom in.
+  function showInfoWindowAndZoomIn() {
+    // Create info window
+    createInfoWindow(this);
+
     // Zoom in before opening the info window.
     userZoom = map.getZoom();
     if (userZoom < 14) {
       map.setZoom(14);
-      map.setCenter(marker.getPosition());
+      map.setCenter(this.getPosition());
     }
+
+    // If the map is already on zoom level 14, return to default zoom level.
+    else if (userZoom = 14) {
+      map.setZoom(2);
+    }
+
     // Open the info window.
-    infoWindow.open(map, marker);
+    infoWindow.open(map, this);
+  }
+
+  // Close the popup window.
+  function closeInfoWindow() {
+      infoWindow.close();
   }
 
   // Respond to change in conference selector.
@@ -330,7 +364,7 @@
   </div>
 
   <div id = "branding" class="controls">
-     <span>Tech Comm on a Map 
+     <span>Tech Comm on a Map
        (<a href="http://ffeathers.wordpress.com/2014/05/07/introducing-tech-comm-on-a-map/">about</a>)
      </span>
   </div>
