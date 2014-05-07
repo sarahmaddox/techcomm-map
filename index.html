@@ -1,1 +1,339 @@
-Hello world
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tech Comm on a Map</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+<style>
+  html, body, #map-canvas {
+    height: 100%;
+    margin: 0px;
+    padding: 0px
+  }
+
+  .controls {
+    margin-top: 16px;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+   #branding {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+  }
+
+  #place-search {
+    background-color: #fff;
+    padding: 0 11px 0 13px;
+    width: 400px;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    text-overflow: ellipsis;
+  }
+
+  #place-search:focus {
+    border-color: #4d90fe;
+    margin-left: -1px;
+    padding-left: 14px;  /* Regular padding-left + 1. */
+    width: 401px;
+  }
+
+  .pac-container {
+    font-family: Roboto;
+  }
+
+  #type-selector {
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+  }
+
+  #type-selector label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  .infowindow {
+    font-family: Roboto;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  #infowindow h2 {
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 500;
+  }
+</style>
+
+<!-- Load the Google Maps JavaScript API -->
+<script type="text/javascript"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwWekcCNrI7bXKrGY4kOUWQjQGImf2lzc&sensor=false&libraries=places">
+</script>
+
+<!-- Set up the map and UI controls -->
+<script type="text/javascript">
+  var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=callback";
+  var map;
+  var icon;
+  var techCommItems = [];
+  var infoWindow = new google.maps.InfoWindow();
+  var userZoom = 2;
+
+  // This function is called after the page has loaded, to set up the map
+  function initializeMap() {
+    map = new google.maps.Map(document.getElementById("map-canvas"), {
+      center: {lat: 10.367178, lng: 16.998713},
+      zoom: 2
+    });
+
+    // Insert a script element into the document header, to get
+    // the tech comm data from a Google Docs spreadsheet.
+    var scriptElement = document.createElement('script');
+    scriptElement.src = DATA_SERVICE_URL;
+    document.getElementsByTagName('head')[0].appendChild(scriptElement);
+
+    // Add the search box and data type selectors to the UI.
+    var input = /** @type {HTMLInputElement} */(
+      document.getElementById('place-search'));
+
+    var types = document.getElementById('type-selector');
+    var branding = document.getElementById('branding');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(branding);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    var autocomplete = new google.maps.places.Autocomplete(input);
+
+    // When the user searches for and selects a place, zoom in and add a marker.
+    var searchMarker = new google.maps.Marker({
+      map: map,
+      visible: false,
+    });
+
+    autocomplete.addListener('place_changed', function() {
+      searchMarker.setVisible(false);
+      var place = autocomplete.getPlace();
+      if (!place.geometry) {
+        return;
+      }
+
+      // If the place has a geometry, then show it on the map.
+      if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+      } else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(17);
+      }
+      searchMarker.setIcon(/** @type {google.maps.Icon} */({
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(35, 35)
+      }));
+      searchMarker.setPosition(place.geometry.location);
+      searchMarker.setVisible(true);
+    });
+  }
+
+  // Get the data from the tech comm spreadsheet.
+  function callback(data) {
+    // Get the spreadsheet rows one by one.
+    // First row contains headings, so start the index at 1 not 0.
+    for (var i = 1; i < data.length; i++) {
+      addTechCommItem({
+        type: data[i][0],
+        name: data[i][1],
+        description: data[i][2],
+        website: data[i][3],
+        startdate: data[i][4],
+        enddate: data[i][5],
+        address: data[i][6],
+        location: new google.maps.LatLng(data[i][7], data[i][8]),
+        marker: null
+      });
+    }
+  }
+
+  // Set up markers for tech com items
+  function addTechCommItem(itemInfo) {
+    //Style a marker based on type of tech comm item.
+    switch (itemInfo.type) {
+      case 'Conference':
+        icon = {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#c077f1',
+          fillOpacity: 1,
+          strokeColor: '#a347e1',
+          strokeWeight: 3,
+          scale: 10
+        };
+        break;
+      case 'Society':
+        icon = {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#f6bb2e',
+          fillOpacity: 1,
+          strokeColor: '#ee7b0c',
+          strokeWeight: 3,
+          scale: 10
+        };
+        break;
+      default:
+        icon = {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#017cff',
+          fillOpacity: 1,
+          strokeColor: '#0000ff',
+          strokeWeight: 3,
+          scale: 10
+        };
+    }
+
+    // Create a marker.
+    var marker = new google.maps.Marker({
+      position: itemInfo.location,
+      icon: icon,
+      map: map
+    });
+
+    // Show an info window when the user clicks the marker.
+    marker.addListener('click', showInfoWindow);
+
+    // Add the item to the array of items.
+    itemInfo.marker = marker;
+    techCommItems.push(itemInfo);
+  }
+
+  // Show the tech comm info in a popup window.
+  function showInfoWindow() {
+    var marker = this;
+    infoWindow.setPosition(marker.getPosition());
+    infoWindow.setContent('No information found');
+    for (var i = 0; i < techCommItems.length; i++) {
+      if (techCommItems[i].marker == marker) {
+        var content = '<div id="infowindow" class="infowindow">' +
+            '<h2>' + techCommItems[i].name + '</h2>' +
+            '<p><em>' + techCommItems[i].type + '</em>';
+        if (techCommItems[i].website != '') {
+          content = content + '  (' + techCommItems[i].website + ')';
+        }
+        content = content + '</p>' +
+          '<p>' + techCommItems[i].description + '</p>';
+        if (techCommItems[i].startdate != '') {
+          content = content + '<p>' + techCommItems[i].startdate;
+        }
+        if (techCommItems[i].enddate != '') {
+          content = content + ' - ' + techCommItems[i].enddate;
+        }
+
+        content = content + '</p>' + '<p>' + techCommItems[i].address +
+          '</p>' + '</div>';
+
+        infoWindow.setContent(content);
+      }
+    }
+    // Zoom in before opening the info window.
+    userZoom = map.getZoom();
+    if (userZoom < 14) {
+      map.setZoom(14);
+      map.setCenter(marker.getPosition());
+    }
+    // Open the info window.
+    infoWindow.open(map, marker);
+  }
+
+  // Respond to change in conference selector.
+  function hideShowConferences(checkBox) {
+    if (checkBox.checked) {
+      showTechCommItems('Conference');
+    } else {
+      hideTechCommItems('Conference');
+    }
+  }
+
+  // Respond to change in society selector.
+  function hideShowSocieties(checkBox) {
+    if (checkBox.checked) {
+      showTechCommItems('Society');
+    } else {
+      hideTechCommItems('Society');
+    }
+  }
+
+  // Respond to change in type 'other' selector.
+  function hideShowOther(checkBox) {
+    if (checkBox.checked) {
+      showTechCommItems('Other');
+    } else {
+      hideTechCommItems('Other');
+    }
+  }
+
+  // Show the markers for the item type selected by the user.
+  function showTechCommItems(itemType) {
+    for (var i = 0; i < techCommItems.length; i++) {
+      if (techCommItems[i].type == itemType) {
+        techCommItems[i].marker.setMap(map);
+      }
+    }
+  }
+
+  // Hide the markers for the item type deselected by the user.
+  function hideTechCommItems(itemType) {
+    for (var i = 0; i < techCommItems.length; i++) {
+      if (techCommItems[i].type == itemType) {
+        techCommItems[i].marker.setMap(null);
+      }
+    }
+  }
+
+  // Load the map.
+  google.maps.event.addDomListener(window, 'load', initializeMap);
+</script>
+
+</head>
+<body>
+  <!-- Search box -->
+  <input id="place-search" class="controls" type="text"
+  placeholder="Search for a location">
+
+  <!-- Data type selectors -->
+  <div id="type-selector" class="controls">
+    <input type="checkbox" name="type" id="selecttype-conference"
+      checked="checked" onclick="hideShowConferences(this)">
+    <label for="selecttype-conference">Conferences</label>
+
+    <input type="checkbox" name="type" id="selecttype-society"
+      checked="checked" onclick="hideShowSocieties(this)">
+    <label for="selecttype-society">Societies</label>
+
+    <input type="checkbox" name="type" id="selecttype-other"
+      checked="checked" onclick="hideShowOther(this)">
+    <label for="selecttype-other">Other</label>
+  </div>
+
+  <div id = "branding" class="controls">
+     <span>Tech Comm on a Map (<a href=http://ffeathers.wordpress.com>about</a>)</span>
+  </div>
+
+  <!-- Map -->
+  <div id="map-canvas"></div>
+</body>
+</html>
