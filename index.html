@@ -229,8 +229,6 @@
 
   // Create a popup window containing the tech comm info.
   function createInfoWindow(marker) {
-    // var marker = this;
-    // alert (marker);
     infoWindow.setPosition(marker.getPosition());
     infoWindow.setContent('No information found');
     for (var i = 0; i < techCommItems.length; i++) {
