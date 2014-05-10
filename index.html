@@ -94,6 +94,7 @@
   var techCommItems = [];
   var infoWindow = new google.maps.InfoWindow();
   var userZoom = 2;
+  var markerClicked = false;
 
   // This function is called after the page has loaded, to set up the map
   function initializeMap() {
@@ -214,10 +215,10 @@
     });
 
     // Show an info window when the user clicks the marker.
-    marker.addListener('click', showInfoWindowAndZoomIn);
+    marker.addListener('click', handleClick);
 
     // Show an info window when the mouse hovers the marker.
-    marker.addListener('mouseover', showInfoWindow);
+    marker.addListener('mouseover', handleHover);
 
     // Close the info window when the mouse leaves the marker.
     marker.addListener('mouseout', closeInfoWindow);
@@ -256,8 +257,8 @@
     }
   }
 
-  // Show the popup window.
-  function showInfoWindow() {
+  // On hover over marker, show the popup window.
+  function handleHover() {
     // Create info window
     createInfoWindow(this);
 
@@ -265,30 +266,37 @@
     infoWindow.open(map, this);
   }
 
-  // Show the popup window and zoom in.
-  function showInfoWindowAndZoomIn() {
-    // Create info window
-    createInfoWindow(this);
-
-    // Zoom in before opening the info window.
-    userZoom = map.getZoom();
-    if (userZoom < 14) {
-      map.setZoom(14);
-      map.setCenter(this.getPosition());
+  // On click of marker, show the popup window and zoom in.
+  function handleClick() {
+    if (markerClicked) {
+      // This is the second click, so zoom back to user's previous zoom level.
+      map.setZoom(userZoom);
+      markerClicked = false;
     }
-
-    // If the map is already on zoom level 14, return to default zoom level.
-    else if (userZoom = 14) {
-      map.setZoom(2);
+    else {
+      // This is the first click, so show the popup window and zoom in.
+      createInfoWindow(this);
+  
+      // Zoom in before opening the info window.
+      // If the user has already zoomed in beyond our preferred zoom,
+      // leave their zoom setting untouched.
+      userZoom = map.getZoom();
+      if (userZoom < 14) {
+        map.setZoom(14);
+        map.setCenter(this.getPosition());
+      }
+  
+      // Open the info window.
+      infoWindow.open(map, this);
+      markerClicked = true;
     }
-
-    // Open the info window.
-    infoWindow.open(map, this);
   }
 
-  // Close the popup window.
+  // Close the popup window, if it was opened on hover.
   function closeInfoWindow() {
+    if (!markerClicked) {
       infoWindow.close();
+    }
   }
 
   // Respond to change in conference selector.
