@@ -89,18 +89,20 @@
 <!-- Set up the map and UI controls -->
 <script type="text/javascript">
   var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=callback";
+  var DEFAULT_ZOOM = 2;
+  var AUTO_ZOOM = 14;
   var map;
   var icon;
   var techCommItems = [];
   var infoWindow = new google.maps.InfoWindow();
-  var userZoom = 2;
+  var userZoom = DEFAULT_ZOOM;
   var markerClicked = false;
 
   // This function is called after the page has loaded, to set up the map
   function initializeMap() {
     map = new google.maps.Map(document.getElementById("map-canvas"), {
       center: {lat: 10.367178, lng: 16.998713},
-      zoom: 2
+      zoom: DEFAULT_ZOOM
     });
 
     // Insert a script element into the document header, to get
@@ -139,7 +141,7 @@
         map.fitBounds(place.geometry.viewport);
       } else {
         map.setCenter(place.geometry.location);
-        map.setZoom(17);
+        map.setZoom(AUTO_ZOOM);
       }
       searchMarker.setIcon(/** @type {google.maps.Icon} */({
         url: place.icon,
@@ -278,11 +280,11 @@
       createInfoWindow(this);
   
       // Zoom in before opening the info window.
-      // If the user has already zoomed in beyond our preferred zoom,
+      // If the user has already zoomed in beyond our automatic zoom,
       // leave their zoom setting untouched.
       userZoom = map.getZoom();
-      if (userZoom < 14) {
-        map.setZoom(14);
+      if (userZoom < AUTO_ZOOM) {
+        map.setZoom(AUTO_ZOOM);
         map.setCenter(this.getPosition());
       }
   
