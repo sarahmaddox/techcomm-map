@@ -92,9 +92,10 @@
   var DEFAULT_ZOOM = 2;
   var AUTO_ZOOM = 14;
   var map;
-  var icon;
-  var techCommItems = [];
-  var infoWindow = new google.maps.InfoWindow();
+  var checkboxes = {};
+  var infoWindow = new google.maps.InfoWindow({
+    pixelOffset: new google.maps.Size(0, -10)
+  });
   var userZoom = DEFAULT_ZOOM;
   var markerClicked = false;
 
@@ -104,6 +105,8 @@
       center: {lat: 10.367178, lng: 16.998713},
       zoom: DEFAULT_ZOOM
     });
+    restyle();
+    setupEventHandlers();
 
     // Insert a script element into the document header, to get
     // the tech comm data from a Google Docs spreadsheet.
@@ -160,116 +163,115 @@
     // Get the spreadsheet rows one by one.
     // First row contains headings, so start the index at 1 not 0.
     for (var i = 1; i < data.length; i++) {
-      addTechCommItem({
-        type: data[i][0],
-        name: data[i][1],
-        description: data[i][2],
-        website: data[i][3],
-        startdate: data[i][4],
-        enddate: data[i][5],
-        address: data[i][6],
-        location: new google.maps.LatLng(data[i][7], data[i][8]),
-        marker: null
+      map.data.add({
+        properties: {
+          type: data[i][0],
+          name: data[i][1],
+          description: data[i][2],
+          website: data[i][3],
+          startdate: data[i][4],
+          enddate: data[i][5],
+          address: data[i][6]
+        },
+        geometry: {
+          lat: data[i][7], 
+          lng: data[i][8]
+        }
       });
     }
   }
 
-  // Set up markers for tech com items
-  function addTechCommItem(itemInfo) {
-    //Style a marker based on type of tech comm item.
-    switch (itemInfo.type) {
-      case 'Conference':
-        icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#c077f1',
-          fillOpacity: 1,
-          strokeColor: '#a347e1',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      case 'Society':
-        icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#f6bb2e',
-          fillOpacity: 1,
-          strokeColor: '#ee7b0c',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      default:
-        icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#017cff',
-          fillOpacity: 1,
-          strokeColor: '#0000ff',
-          strokeWeight: 3,
-          scale: 10
-        };
-    }
+  // Set up data styling
+  function restyle() {
+    map.data.setStyle(function(feature) {
+      var style = {};
+      var type = feature.getProperty('type');
 
-    // Create a marker.
-    var marker = new google.maps.Marker({
-      position: itemInfo.location,
-      icon: icon,
-      map: map
+      style.visible = (checkboxes[type] != false);
+
+      //Style a marker based on type of tech comm item.
+      switch (type) {
+        case 'Conference':
+          style.icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#c077f1',
+            fillOpacity: 1,
+            strokeColor: '#a347e1',
+            strokeWeight: 3,
+            scale: 10
+          };
+          break;
+        case 'Society':
+          style.icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#f6bb2e',
+            fillOpacity: 1,
+            strokeColor: '#ee7b0c',
+            strokeWeight: 3,
+            scale: 10
+          };
+          break;
+        default:
+          style.icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#017cff',
+            fillOpacity: 1,
+            strokeColor: '#0000ff',
+            strokeWeight: 3,
+            scale: 10
+          };
+      }
+      return style;
     });
+  }
 
-    // Show an info window when the user clicks the marker.
-    marker.addListener('click', handleClick);
+  function setupEventHandlers() {
+    // Show an info window when the user clicks an item.
+    map.data.addListener('click', handleClick);
 
-    // Show an info window when the mouse hovers the marker.
-    marker.addListener('mouseover', handleHover);
+    // Show an info window when the mouse hovers an item.
+    map.data.addListener('mouseover', handleHover);
 
-    // Close the info window when the mouse leaves the marker.
-    marker.addListener('mouseout', closeInfoWindow);
-
-    // Add the item to the array of items.
-    itemInfo.marker = marker;
-    techCommItems.push(itemInfo);
+    // Close the info window when the mouse leaves an item.
+    map.data.addListener('mouseout', closeInfoWindow);
   }
 
   // Create a popup window containing the tech comm info.
-  function createInfoWindow(marker) {
-    infoWindow.setPosition(marker.getPosition());
+  function createInfoWindow(feature) {
+    infoWindow.setPosition(feature.getGeometry().get());
     infoWindow.setContent('No information found');
-    for (var i = 0; i < techCommItems.length; i++) {
-      if (techCommItems[i].marker == marker) {
-        var content = '<div id="infowindow" class="infowindow">' +
-            '<h2>' + techCommItems[i].name + '</h2>' +
-            '<p><em>' + techCommItems[i].type + '</em>';
-        if (techCommItems[i].website != '') {
-          content = content + '  (' + techCommItems[i].website + ')';
-        }
-        content = content + '</p>' +
-          '<p>' + techCommItems[i].description + '</p>';
-        if (techCommItems[i].startdate != '') {
-          content = content + '<p>' + techCommItems[i].startdate;
-        }
-        if (techCommItems[i].enddate != '') {
-          content = content + ' - ' + techCommItems[i].enddate;
-        }
-
-        content = content + '</p>' + '<p>' + techCommItems[i].address +
-          '</p>' + '</div>';
-
-        infoWindow.setContent(content);
-      }
+    var content = '<div id="infowindow" class="infowindow">' +
+        '<h2>' + feature.getProperty('name') + '</h2>' +
+        '<p><em>' + feature.getProperty('type') + '</em>';
+    if (feature.getProperty('website') != '') {
+      content = content + '  (' + feature.getProperty('website') + ')';
     }
+    content = content + '</p>' +
+      '<p>' + feature.getProperty('description') + '</p>';
+    if (feature.getProperty('startdate') != '') {
+      content = content + '<p>' + feature.getProperty('startdate');
+    }
+    if (feature.getProperty('enddate') != '') {
+      content = content + ' - ' + feature.getProperty('enddate');
+    }
+
+    content = content + '</p>' + '<p>' + feature.getProperty('address') +
+      '</p>' + '</div>';
+
+    infoWindow.setContent(content);
   }
 
   // On hover over marker, show the popup window.
-  function handleHover() {
+  function handleHover(event) {
     // Create info window
-    createInfoWindow(this);
+    createInfoWindow(event.feature);
 
     // Open the info window.
-    infoWindow.open(map, this);
+    infoWindow.open(map);
   }
 
   // On click of marker, show the popup window and zoom in.
-  function handleClick() {
+  function handleClick(event) {
     if (markerClicked) {
       // This is the second click, so zoom back to user's previous zoom level.
       map.setZoom(userZoom);
@@ -277,7 +279,7 @@
     }
     else {
       // This is the first click, so show the popup window and zoom in.
-      createInfoWindow(this);
+      createInfoWindow(event.feature);
   
       // Zoom in before opening the info window.
       // If the user has already zoomed in beyond our automatic zoom,
@@ -285,11 +287,11 @@
       userZoom = map.getZoom();
       if (userZoom < AUTO_ZOOM) {
         map.setZoom(AUTO_ZOOM);
-        map.setCenter(this.getPosition());
+        map.setCenter(event.feature.getGeometry().get());
       }
   
       // Open the info window.
-      infoWindow.open(map, this);
+      infoWindow.open(map);
       markerClicked = true;
     }
   }
@@ -303,47 +305,20 @@
 
   // Respond to change in conference selector.
   function hideShowConferences(checkBox) {
-    if (checkBox.checked) {
-      showTechCommItems('Conference');
-    } else {
-      hideTechCommItems('Conference');
-    }
+    checkboxes['Conference'] = checkBox.checked;
+    restyle();
   }
 
   // Respond to change in society selector.
   function hideShowSocieties(checkBox) {
-    if (checkBox.checked) {
-      showTechCommItems('Society');
-    } else {
-      hideTechCommItems('Society');
-    }
+    checkboxes['Society'] = checkBox.checked;
+    restyle();
   }
 
   // Respond to change in type 'other' selector.
   function hideShowOther(checkBox) {
-    if (checkBox.checked) {
-      showTechCommItems('Other');
-    } else {
-      hideTechCommItems('Other');
-    }
-  }
-
-  // Show the markers for the item type selected by the user.
-  function showTechCommItems(itemType) {
-    for (var i = 0; i < techCommItems.length; i++) {
-      if (techCommItems[i].type == itemType) {
-        techCommItems[i].marker.setMap(map);
-      }
-    }
-  }
-
-  // Hide the markers for the item type deselected by the user.
-  function hideTechCommItems(itemType) {
-    for (var i = 0; i < techCommItems.length; i++) {
-      if (techCommItems[i].type == itemType) {
-        techCommItems[i].marker.setMap(null);
-      }
-    }
+    checkboxes['Other'] = checkBox.checked;
+    restyle();
   }
 
   // Load the map.
