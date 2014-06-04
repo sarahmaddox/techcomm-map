@@ -106,7 +106,7 @@
       zoom: DEFAULT_ZOOM
     });
     restyle();
-    setupEventHandlers();
+    setEventHandlers();
 
     // Insert a script element into the document header, to get
     // the tech comm data from a Google Docs spreadsheet.
@@ -187,6 +187,8 @@
       var style = {};
       var type = feature.getProperty('type');
 
+      // Show the markers for this type if
+      // the user has selected the corresponding checkbox.
       style.visible = (checkboxes[type] != false);
 
       //Style a marker based on type of tech comm item.
@@ -225,11 +227,11 @@
     });
   }
 
-  function setupEventHandlers() {
+  function setEventHandlers() {
     // Show an info window when the user clicks an item.
     map.data.addListener('click', handleClick);
 
-    // Show an info window when the mouse hovers an item.
+    // Show an info window when the mouse hovers over an item.
     map.data.addListener('mouseover', handleHover);
 
     // Close the info window when the mouse leaves an item.
