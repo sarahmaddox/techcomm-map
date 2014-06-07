@@ -11,7 +11,48 @@
     padding: 0px
   }
 
-  .controls {
+   #branding {
+    margin-top: 16px;
+    margin-left: 5px;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    width: 220px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+  }
+
+  #type-selector {
+    margin-top: 5px;
+    margin-left: 5px;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 96px;
+    width: 220px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+  }
+
+  #type-selector label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  #place-search {
     margin-top: 16px;
     border: 1px solid transparent;
     border-radius: 2px 0 0 2px;
@@ -20,18 +61,6 @@
     height: 32px;
     outline: none;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  }
-
-   #branding {
-    font-family: Roboto;
-    font-size: 13px;
-    font-weight: 300;
-    color: #fff;
-    background-color: #4d90fe;
-    padding: 5px 11px 0px 11px;
-  }
-
-  #place-search {
     background-color: #fff;
     padding: 0 11px 0 13px;
     width: 400px;
@@ -50,18 +79,6 @@
 
   .pac-container {
     font-family: Roboto;
-  }
-
-  #type-selector {
-    color: #fff;
-    background-color: #4d90fe;
-    padding: 5px 11px 0px 11px;
-  }
-
-  #type-selector label {
-    font-family: Roboto;
-    font-size: 13px;
-    font-weight: 300;
   }
 
   .infowindow {
@@ -103,7 +120,16 @@
   function initializeMap() {
     map = new google.maps.Map(document.getElementById("map-canvas"), {
       center: {lat: 10.367178, lng: 16.998713},
-      zoom: DEFAULT_ZOOM
+      zoom: DEFAULT_ZOOM,
+      panControl: false,
+      streetViewControl: true,
+      streetViewControlOptions: {
+        position: google.maps.ControlPosition.LEFT_BOTTOM
+      },
+      zoomControl: true,
+      zoomControlOptions: {
+        position: google.maps.ControlPosition.LEFT_BOTTOM
+      }
     });
     restyle();
     setEventHandlers();
@@ -121,7 +147,7 @@
     var types = document.getElementById('type-selector');
     var branding = document.getElementById('branding');
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(branding);
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
+    map.controls[google.maps.ControlPosition.LEFT_TOP].push(types);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     var autocomplete = new google.maps.places.Autocomplete(input);
@@ -325,30 +351,31 @@
 
   // Load the map.
   google.maps.event.addDomListener(window, 'load', initializeMap);
-</script>
 
+</script>
 </head>
+
 <body>
   <!-- Search box -->
-  <input id="place-search" class="controls" type="text"
+  <input id="place-search" type="text"
   placeholder="Search for a location">
 
   <!-- Data type selectors -->
-  <div id="type-selector" class="controls">
+  <div id="type-selector">
     <input type="checkbox" name="type" id="selecttype-conference"
       checked="checked" onclick="hideShowConferences(this)">
     <label for="selecttype-conference">Conferences</label>
-
+    <br>
     <input type="checkbox" name="type" id="selecttype-society"
       checked="checked" onclick="hideShowSocieties(this)">
     <label for="selecttype-society">Societies</label>
-
+    <br>
     <input type="checkbox" name="type" id="selecttype-other"
       checked="checked" onclick="hideShowOther(this)">
     <label for="selecttype-other">Other</label>
   </div>
 
-  <div id = "branding" class="controls">
+  <div id = "branding">
      <span>Tech Comm on a Map
        (<a href="http://ffeathers.wordpress.com/2014/05/07/introducing-tech-comm-on-a-map/">about</a>)
      </span>
