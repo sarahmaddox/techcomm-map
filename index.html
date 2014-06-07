@@ -37,7 +37,7 @@
     border-radius: 2px 0 0 2px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    height: 96px;
+    height: 118px;
     width: 230px;
     outline: none;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -58,6 +58,10 @@
 
   #selecttype-society {
     outline: 2px solid #f6bb2e
+  }
+
+  #selecttype-group {
+    outline: 2px solid #ee4bf3
   }
 
   #selecttype-business {
@@ -255,6 +259,16 @@
             scale: 10
           };
           break;
+        case 'Group':
+          style.icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#ee4bf3',
+            fillOpacity: 1,
+            strokeColor: '#ff00ff',
+            strokeWeight: 3,
+            scale: 10
+          };
+          break;
         case 'Business':
           style.icon = {
             path: google.maps.SymbolPath.CIRCLE,
@@ -369,6 +383,12 @@
     restyle();
   }
 
+  // Respond to change in group selector.
+  function hideShowGroups(checkBox) {
+    checkboxes['Group'] = checkBox.checked;
+    restyle();
+  }
+
   // Respond to change in business selector.
   function hideShowBusinesses(checkBox) {
     checkboxes['Business'] = checkBox.checked;
@@ -401,6 +421,10 @@
     <input type="checkbox" name="type" id="selecttype-society"
       checked="checked" onclick="hideShowSocieties(this)">
     <label for="selecttype-society">Societies</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-group"
+      checked="checked" onclick="hideShowGroups(this)">
+    <label for="selecttype-group">Groups</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-business"
       checked="checked" onclick="hideShowBusinesses(this)">
