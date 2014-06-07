@@ -37,7 +37,7 @@
     border-radius: 2px 0 0 2px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    height: 80px;
+    height: 96px;
     width: 220px;
     outline: none;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -239,6 +239,16 @@
             scale: 10
           };
           break;
+        case 'Business':
+          style.icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#1ab61a',
+            fillOpacity: 1,
+            strokeColor: '#008000',
+            strokeWeight: 3,
+            scale: 10
+          };
+          break;
         default:
           style.icon = {
             path: google.maps.SymbolPath.CIRCLE,
@@ -343,6 +353,12 @@
     restyle();
   }
 
+  // Respond to change in business selector.
+  function hideShowBusinesses(checkBox) {
+    checkboxes['Business'] = checkBox.checked;
+    restyle();
+  }
+
   // Respond to change in type 'other' selector.
   function hideShowOther(checkBox) {
     checkboxes['Other'] = checkBox.checked;
@@ -369,6 +385,10 @@
     <input type="checkbox" name="type" id="selecttype-society"
       checked="checked" onclick="hideShowSocieties(this)">
     <label for="selecttype-society">Societies</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-business"
+      checked="checked" onclick="hideShowBusinesses(this)">
+    <label for="selecttype-business">Businesses</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-other"
       checked="checked" onclick="hideShowOther(this)">
