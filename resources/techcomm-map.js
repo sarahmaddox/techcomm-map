@@ -5,15 +5,16 @@ var userZoom = DEFAULT_ZOOM;
 var map;
 var checkboxes = {};
 var infoWindow = new google.maps.InfoWindow({
-  pixelOffset: new google.maps.Size(0, -10)
+  pixelOffset: new google.maps.Size(0, -10),
+  disableAutoPan: true
 });
 var markerClicked = false;
 var previousName;
 
-// This function is called after the page has loaded, to set up the map
+// This function is called after the page has loaded, to set up the map.
 function initializeMap() {
   map = new google.maps.Map(document.getElementById("map-canvas"), {
-    center: {lat: 10.367178, lng: 16.998713},
+    center: {lat: 35.55, lng: 16.50},
     zoom: DEFAULT_ZOOM,
     panControl: false,
     streetViewControl: true,
