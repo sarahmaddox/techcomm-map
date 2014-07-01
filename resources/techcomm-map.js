@@ -1,4 +1,8 @@
 var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=callback";
+// DEFAULT_ZOOM is the default zoom level for the map.
+// AUTO_ZOOM is the level used when we automatically zoom into a place when
+// the user selects a marker or searches for a place.
+// userZoom holds the zoom value the user has chosen.
 var DEFAULT_ZOOM = 2;
 var AUTO_ZOOM = 14;
 var userZoom = DEFAULT_ZOOM;
@@ -8,6 +12,10 @@ var infoWindow = new google.maps.InfoWindow({
   pixelOffset: new google.maps.Size(0, -10),
   disableAutoPan: true
 });
+// The markerClicked flag indicates whether an info window is open because the
+// user clicked a marker. True means the user clicked a marker. False
+// means the user simply hovered over the marker, or the user has closed the
+// info window.
 var markerClicked = false;
 var previousName;
 
@@ -30,7 +38,8 @@ function initializeMap() {
   setEventHandlers();
 
   // Insert a script element into the document header, to get
-  // the tech comm data from a Google Docs spreadsheet.
+  // the tech comm data from a Google Docs spreadsheet via
+  // a JSONP callback.
   var scriptElement = document.createElement('script');
   scriptElement.src = DATA_SERVICE_URL;
   document.getElementsByTagName('head')[0].appendChild(scriptElement);
@@ -179,7 +188,7 @@ function setEventHandlers() {
   map.data.addListener('mouseout', handleMouseOut);
 
   // Reset the click flag when the user closes the info window.
-  google.maps.event.addListener(infoWindow, 'closeclick', function() {
+  infoWindow.addListener('closeclick', function() {
     markerClicked = false;
   });
 }
@@ -191,15 +200,15 @@ function createInfoWindow(feature) {
   var content = '<div id="infowindow" class="infowindow">' +
       '<h2>' + feature.getProperty('name') + '</h2>' +
       '<p><em>' + feature.getProperty('type') + '</em>';
-  if (feature.getProperty('website') != '') {
+  if (feature.getProperty('website')) {
     content = content + '  (' + feature.getProperty('website') + ')';
   }
   content = content + '</p>' +
     '<p>' + feature.getProperty('description') + '</p>';
-  if (feature.getProperty('startdate') != '') {
+  if (feature.getProperty('startdate')) {
     content = content + '<p>' + feature.getProperty('startdate');
   }
-  if (feature.getProperty('enddate') != '') {
+  if (feature.getProperty('enddate')) {
     content = content + ' - ' + feature.getProperty('enddate');
   }
 
@@ -229,8 +238,7 @@ function handleClick(event) {
     // Reset flags ready for next time round.
     previousName = '';
     markerClicked = false;
-  }
-  else {
+  } else {
     previousName = event.feature.getProperty('name'); 
     // This is the first click, so show the popup window and zoom in.
     createInfoWindow(event.feature);
@@ -240,8 +248,7 @@ function handleClick(event) {
     // leave their zoom setting untouched.
     if (map.getZoom() > AUTO_ZOOM) {
       userZoom = map.getZoom();
-    }
-    else {
+    } else {
       map.setZoom(AUTO_ZOOM);
       map.setCenter(event.feature.getGeometry().get());
       userZoom = DEFAULT_ZOOM;
