@@ -178,28 +178,32 @@ function setEventHandlers() {
 function createInfoWindow(feature) {
   infoWindow.setPosition(feature.getGeometry().get());
   infoWindow.setContent('No information found');
-  var content = '<div id="infowindow" class="infowindow">';
 
-  content += '<h2>' + feature.getProperty('name') + '</h2>';
+  var content = $('<div id="infowindow" class="infowindow">');
+  
+  content.append($('<h2>').text(feature.getProperty('name')));
 
-  content += '<p><em>' + feature.getProperty('type') + '</em>';
+  var typeAndWebsite = $('<p>');
+  typeAndWebsite.append($('<em>').text(feature.getProperty('type')));
   if (feature.getProperty('website')) {
-    content += ' (' + feature.getProperty('website') + ')';
+    typeAndWebsite.append($('<span>')
+        .text(' (' + feature.getProperty('website') + ')'));
   }
+  content.append(typeAndWebsite);
 
-  content += '<p>' + feature.getProperty('description');
+  content.append($('<p>').text(feature.getProperty('description')));
   
   if (feature.getProperty('startdate')) {
-    content += '<p>' + feature.getProperty('startdate');
+    date = feature.getProperty('startdate');
     if (feature.getProperty('enddate')) {
-      content += ' &ndash; ' + feature.getProperty('enddate');
+      date += ' &ndash; ' + feature.getProperty('enddate');
     }
+    content.append($('<p>').text(date));
   }
 
-  content += '<p>' + feature.getProperty('address');
+  content.append($('<p>').text(feature.getProperty('address')));
 
-  content += '</div>';
-  infoWindow.setContent(content);
+  infoWindow.setContent(content.html());
 }
 
 // On click of marker, show the popup window and zoom in.
@@ -238,6 +242,7 @@ function handleFeatureClick(event) {
 // Respond to change in conference type selectors.
 function handleCheckBoxClick(checkBox, type) {
   checkboxes[type] = checkBox.checked;
+  // Tell the Data Layer to recompute the style, since checkboxes have changed.
   map.data.setStyle(techCommItemStyle);
 }
 
