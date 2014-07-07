@@ -26,23 +26,23 @@
   <!-- Data type selectors -->
   <div id="type-selector">
     <input type="checkbox" name="type" id="selecttype-conference"
-      checked="checked" onclick="hideShowConferences(this)">
+      checked="checked" onclick="handleCheckBoxClick(this, 'Conference')">
     <label for="selecttype-conference">Conferences</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-society"
-      checked="checked" onclick="hideShowSocieties(this)">
+      checked="checked" onclick="handleCheckBoxClick(this, 'Society')">
     <label for="selecttype-society">Societies</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-group"
-      checked="checked" onclick="hideShowGroups(this)">
+      checked="checked" onclick="handleCheckBoxClick(this, 'Group')">
     <label for="selecttype-group">Groups</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-business"
-      checked="checked" onclick="hideShowBusinesses(this)">
+      checked="checked" onclick="handleCheckBoxClick(this, 'Business')">
     <label for="selecttype-business">Businesses</label>
     <br>
     <input type="checkbox" name="type" id="selecttype-other"
-      checked="checked" onclick="hideShowOther(this)">
+      checked="checked" onclick="handleCheckBoxClick(this, 'Other')">
     <label for="selecttype-other">Other</label>
   </div>
 
