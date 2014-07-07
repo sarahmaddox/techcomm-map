@@ -1,4 +1,4 @@
-var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=callback";
+var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?";
 // DEFAULT_ZOOM is the default zoom level for the map.
 // AUTO_ZOOM is the level used when we automatically zoom into a place when
 // the user selects a marker or searches for a place.
@@ -36,13 +36,6 @@ function initializeMap() {
   });
   restyle();
   setEventHandlers();
-
-  // Insert a script element into the document header, to get
-  // the tech comm data from a Google Docs spreadsheet via
-  // a JSONP callback.
-  var scriptElement = document.createElement('script');
-  scriptElement.src = DATA_SERVICE_URL;
-  document.getElementsByTagName('head')[0].appendChild(scriptElement);
 
   // Add the search box and data type selectors to the UI.
   var input = /** @type {HTMLInputElement} */(
@@ -86,29 +79,33 @@ function initializeMap() {
     searchMarker.setPosition(place.geometry.location);
     searchMarker.setVisible(true);
   });
-}
 
-// Get the data from the tech comm spreadsheet.
-function callback(data) {
-  // Get the spreadsheet rows one by one.
-  // First row contains headings, so start the index at 1 not 0.
-  for (var i = 1; i < data.length; i++) {
-    map.data.add({
-      properties: {
-        type: data[i][0],
-        name: data[i][1],
-        description: data[i][2],
-        website: data[i][3],
-        startdate: data[i][4],
-        enddate: data[i][5],
-        address: data[i][6]
-      },
-      geometry: {
-        lat: data[i][7], 
-        lng: data[i][8]
+  // Get the data from the tech comm spreadsheet.
+  $.ajax({
+    url: DATA_SERVICE_URL,
+    dataType: 'jsonp',
+    success: function(data) {
+      // Get the spreadsheet rows one by one.
+      // First row contains headings, so start the index at 1 not 0.
+      for (var i = 1; i < data.length; i++) {
+        map.data.add({
+          properties: {
+            type: data[i][0],
+            name: data[i][1],
+            description: data[i][2],
+            website: data[i][3],
+            startdate: data[i][4],
+            enddate: data[i][5],
+            address: data[i][6]
+          },
+          geometry: {
+            lat: data[i][7], 
+            lng: data[i][8]
+          }
+        });
       }
-    });
-  }
+    }
+  });
 }
 
 // Set up data styling
