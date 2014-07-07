@@ -34,8 +34,10 @@ function initializeMap() {
       position: google.maps.ControlPosition.LEFT_BOTTOM
     }
   });
-  restyle();
   setEventHandlers();
+  // The techCommItemStyle() function computes how each item should be styled.
+  // Register it here.
+  map.data.setStyle(techCommItemStyle);
 
   // Insert a script element into the document header, to get
   // the tech comm data from a Google Docs spreadsheet via
@@ -111,12 +113,8 @@ function callback(data) {
   }
 }
 
-// Set up data styling
-function restyle() {
-  map.data.setStyle(getStyle);
-}
-
-function getStyle(feature) {
+// Returns the style that should be used to display the given feature.
+function techCommItemStyle(feature) {
   var type = feature.getProperty('type');
 
   var style = {
@@ -131,7 +129,7 @@ function getStyle(feature) {
     visible: (checkboxes[type] != false)
   };
 
-  // Set the marker colour marker based on type of tech comm item.
+  // Set the marker colour based on type of tech comm item.
   switch (type) {
     case 'Conference':
       style.icon.fillColor = '#c077f1';
@@ -243,7 +241,7 @@ function handleFeatureClick(event) {
 // Respond to change in conference type selectors.
 function handleCheckBoxClick(checkBox, type) {
   checkboxes[type] = checkBox.checked;
-  restyle();
+  map.data.setStyle(techCommItemStyle);
 }
 
 // Load the map.
