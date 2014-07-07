@@ -34,8 +34,10 @@ function initializeMap() {
       position: google.maps.ControlPosition.LEFT_BOTTOM
     }
   });
-  restyle();
   setEventHandlers();
+  // The techCommItemStyle() function computes how each item should be styled.
+  // Register it here.
+  map.data.setStyle(techCommItemStyle);
 
   // Add the search box and data type selectors to the UI.
   var input = /** @type {HTMLInputElement} */(
@@ -108,81 +110,63 @@ function initializeMap() {
   });
 }
 
-// Set up data styling
-function restyle() {
-  map.data.setStyle(function(feature) {
-    var style = {};
-    var type = feature.getProperty('type');
+// Returns the style that should be used to display the given feature.
+function techCommItemStyle(feature) {
+  var type = feature.getProperty('type');
 
+  var style = {
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillOpacity: 1,
+      strokeWeight: 3,
+      scale: 10        
+    },
     // Show the markers for this type if
     // the user has selected the corresponding checkbox.
-    style.visible = (checkboxes[type] != false);
+    visible: (checkboxes[type] != false)
+  };
 
-    //Style a marker based on type of tech comm item.
-    switch (type) {
-      case 'Conference':
-        style.icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#c077f1',
-          fillOpacity: 1,
-          strokeColor: '#a347e1',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      case 'Society':
-        style.icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#f6bb2e',
-          fillOpacity: 1,
-          strokeColor: '#ee7b0c',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      case 'Group':
-        style.icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#ee4bf3',
-          fillOpacity: 1,
-          strokeColor: '#ff00ff',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      case 'Business':
-        style.icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#1ab61a',
-          fillOpacity: 1,
-          strokeColor: '#008000',
-          strokeWeight: 3,
-          scale: 10
-        };
-        break;
-      default:
-        style.icon = {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: '#017cff',
-          fillOpacity: 1,
-          strokeColor: '#0000ff',
-          strokeWeight: 3,
-          scale: 10
-        };
-    }
-    return style;
-  });
+  // Set the marker colour based on type of tech comm item.
+  switch (type) {
+    case 'Conference':
+      style.icon.fillColor = '#c077f1';
+      style.icon.strokeColor = '#a347e1';
+      break;
+    case 'Society':
+      style.icon.fillColor = '#f6bb2e';
+      style.icon.strokeColor = '#ee7b0c';
+      break;
+    case 'Group':
+      style.icon.fillColor = '#ee4bf3';
+      style.icon.strokeColor = '#ff00ff';
+      break;
+    case 'Business':
+      style.icon.fillColor = '#1ab61a';
+      style.icon.strokeColor = '#008000';
+      break;
+    default:
+      style.icon.fillColor = '#017cff';
+      style.icon.strokeColor = '#0000ff';
+  }
+  return style;
 }
 
 function setEventHandlers() {
   // Show an info window when the user clicks an item.
-  map.data.addListener('click', handleClick);
+  map.data.addListener('click', handleFeatureClick);
 
   // Show an info window when the mouse hovers over an item.
-  map.data.addListener('mouseover', handleHover);
+  map.data.addListener('mouseover', function(event) {
+    createInfoWindow(event.feature);
+    infoWindow.open(map);
+  });
 
   // Close the info window when the mouse leaves an item.
-  map.data.addListener('mouseout', handleMouseOut);
+  map.data.addListener('mouseout', function() {
+    if (!markerClicked) {
+      infoWindow.close();
+    }
+  });
 
   // Reset the click flag when the user closes the info window.
   infoWindow.addListener('closeclick', function() {
@@ -194,38 +178,32 @@ function setEventHandlers() {
 function createInfoWindow(feature) {
   infoWindow.setPosition(feature.getGeometry().get());
   infoWindow.setContent('No information found');
-  var content = '<div id="infowindow" class="infowindow">' +
-      '<h2>' + feature.getProperty('name') + '</h2>' +
-      '<p><em>' + feature.getProperty('type') + '</em>';
+  var content = '<div id="infowindow" class="infowindow">';
+
+  content += '<h2>' + feature.getProperty('name') + '</h2>';
+
+  content += '<p><em>' + feature.getProperty('type') + '</em>';
   if (feature.getProperty('website')) {
-    content = content + '  (' + feature.getProperty('website') + ')';
+    content += ' (' + feature.getProperty('website') + ')';
   }
-  content = content + '</p>' +
-    '<p>' + feature.getProperty('description') + '</p>';
+
+  content += '<p>' + feature.getProperty('description');
+  
   if (feature.getProperty('startdate')) {
-    content = content + '<p>' + feature.getProperty('startdate');
-  }
-  if (feature.getProperty('enddate')) {
-    content = content + ' - ' + feature.getProperty('enddate');
+    content += '<p>' + feature.getProperty('startdate');
+    if (feature.getProperty('enddate')) {
+      content += ' &ndash; ' + feature.getProperty('enddate');
+    }
   }
 
-  content = content + '</p>' + '<p>' + feature.getProperty('address') +
-    '</p>' + '</div>';
+  content += '<p>' + feature.getProperty('address');
 
+  content += '</div>';
   infoWindow.setContent(content);
 }
 
-// On hover over marker, show the popup window.
-function handleHover(event) {
-  // Create info window
-  createInfoWindow(event.feature);
-
-  // Open the info window.
-  infoWindow.open(map);
-}
-
 // On click of marker, show the popup window and zoom in.
-function handleClick(event) {
+function handleFeatureClick(event) {
   // Check whether the marker has been clicked already,
   // because we want to zoom out on second click of same marker.
   var currentName = event.feature.getProperty('name');
@@ -257,41 +235,10 @@ function handleClick(event) {
   }
 }
 
-// Close the popup window, if it was opened on hover.
-function handleMouseOut() {
-  if (!markerClicked) {
-    infoWindow.close();
-  }
-}
-
-// Respond to change in conference selector.
-function hideShowConferences(checkBox) {
-  checkboxes['Conference'] = checkBox.checked;
-  restyle();
-}
-
-// Respond to change in society selector.
-function hideShowSocieties(checkBox) {
-  checkboxes['Society'] = checkBox.checked;
-  restyle();
-}
-
-// Respond to change in group selector.
-function hideShowGroups(checkBox) {
-  checkboxes['Group'] = checkBox.checked;
-  restyle();
-}
-
-// Respond to change in business selector.
-function hideShowBusinesses(checkBox) {
-  checkboxes['Business'] = checkBox.checked;
-  restyle();
-}
-
-// Respond to change in type 'other' selector.
-function hideShowOther(checkBox) {
-  checkboxes['Other'] = checkBox.checked;
-  restyle();
+// Respond to change in conference type selectors.
+function handleCheckBoxClick(checkBox, type) {
+  checkboxes[type] = checkBox.checked;
+  map.data.setStyle(techCommItemStyle);
 }
 
 // Load the map.
