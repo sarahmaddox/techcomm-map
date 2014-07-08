@@ -82,7 +82,7 @@ function initializeMap() {
     searchMarker.setVisible(true);
   });
 
-  // Get the data from the tech comm spreadsheet.
+  // Get the data from the tech comm spreadsheet, using jQuery's ajax helper.
   $.ajax({
     url: DATA_SERVICE_URL,
     dataType: 'jsonp',
@@ -194,9 +194,9 @@ function createInfoWindow(feature) {
   content.append($('<p>').text(feature.getProperty('description')));
   
   if (feature.getProperty('startdate')) {
-    date = feature.getProperty('startdate');
+    var date = feature.getProperty('startdate');
     if (feature.getProperty('enddate')) {
-      date += ' &ndash; ' + feature.getProperty('enddate');
+      date += ' – ' + feature.getProperty('enddate');
     }
     content.append($('<p>').text(date));
   }
