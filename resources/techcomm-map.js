@@ -1,4 +1,4 @@
-var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=callback";
+var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?";
 // DEFAULT_ZOOM is the default zoom level for the map.
 // AUTO_ZOOM is the level used when we automatically zoom into a place when
 // the user selects a marker or searches for a place.
@@ -38,13 +38,6 @@ function initializeMap() {
   // The techCommItemStyle() function computes how each item should be styled.
   // Register it here.
   map.data.setStyle(techCommItemStyle);
-
-  // Insert a script element into the document header, to get
-  // the tech comm data from a Google Docs spreadsheet via
-  // a JSONP callback.
-  var scriptElement = document.createElement('script');
-  scriptElement.src = DATA_SERVICE_URL;
-  document.getElementsByTagName('head')[0].appendChild(scriptElement);
 
   // Add the search box and data type selectors to the UI.
   var input = /** @type {HTMLInputElement} */(
@@ -88,29 +81,33 @@ function initializeMap() {
     searchMarker.setPosition(place.geometry.location);
     searchMarker.setVisible(true);
   });
-}
 
-// Get the data from the tech comm spreadsheet.
-function callback(data) {
-  // Get the spreadsheet rows one by one.
-  // First row contains headings, so start the index at 1 not 0.
-  for (var i = 1; i < data.length; i++) {
-    map.data.add({
-      properties: {
-        type: data[i][0],
-        name: data[i][1],
-        description: data[i][2],
-        website: data[i][3],
-        startdate: data[i][4],
-        enddate: data[i][5],
-        address: data[i][6]
-      },
-      geometry: {
-        lat: data[i][7], 
-        lng: data[i][8]
+  // Get the data from the tech comm spreadsheet, using jQuery's ajax helper.
+  $.ajax({
+    url: DATA_SERVICE_URL,
+    dataType: 'jsonp',
+    success: function(data) {
+      // Get the spreadsheet rows one by one.
+      // First row contains headings, so start the index at 1 not 0.
+      for (var i = 1; i < data.length; i++) {
+        map.data.add({
+          properties: {
+            type: data[i][0],
+            name: data[i][1],
+            description: data[i][2],
+            website: data[i][3],
+            startdate: data[i][4],
+            enddate: data[i][5],
+            address: data[i][6]
+          },
+          geometry: {
+            lat: data[i][7], 
+            lng: data[i][8]
+          }
+        });
       }
-    });
-  }
+    }
+  });
 }
 
 // Returns the style that should be used to display the given feature.
@@ -181,28 +178,32 @@ function setEventHandlers() {
 function createInfoWindow(feature) {
   infoWindow.setPosition(feature.getGeometry().get());
   infoWindow.setContent('No information found');
-  var content = '<div id="infowindow" class="infowindow">';
 
-  content += '<h2>' + feature.getProperty('name') + '</h2>';
+  var content = $('<div id="infowindow" class="infowindow">');
+  
+  content.append($('<h2>').text(feature.getProperty('name')));
 
-  content += '<p><em>' + feature.getProperty('type') + '</em>';
+  var typeAndWebsite = $('<p>');
+  typeAndWebsite.append($('<em>').text(feature.getProperty('type')));
   if (feature.getProperty('website')) {
-    content += ' (' + feature.getProperty('website') + ')';
+    typeAndWebsite.append($('<span>')
+        .text(' (' + feature.getProperty('website') + ')'));
   }
+  content.append(typeAndWebsite);
 
-  content += '<p>' + feature.getProperty('description');
+  content.append($('<p>').text(feature.getProperty('description')));
   
   if (feature.getProperty('startdate')) {
-    content += '<p>' + feature.getProperty('startdate');
+    var date = feature.getProperty('startdate');
     if (feature.getProperty('enddate')) {
-      content += ' &ndash; ' + feature.getProperty('enddate');
+      date += ' – ' + feature.getProperty('enddate');
     }
+    content.append($('<p>').text(date));
   }
 
-  content += '<p>' + feature.getProperty('address');
+  content.append($('<p>').text(feature.getProperty('address')));
 
-  content += '</div>';
-  infoWindow.setContent(content);
+  infoWindow.setContent(content.html());
 }
 
 // On click of marker, show the popup window and zoom in.
@@ -241,6 +242,7 @@ function handleFeatureClick(event) {
 // Respond to change in conference type selectors.
 function handleCheckBoxClick(checkBox, type) {
   checkboxes[type] = checkBox.checked;
+  // Tell the Data Layer to recompute the style, since checkboxes have changed.
   map.data.setStyle(techCommItemStyle);
 }
 
