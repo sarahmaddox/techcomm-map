@@ -128,7 +128,11 @@ function techCommItemStyle(feature) {
 
   // Set the marker colour based on type of tech comm item.
   switch (type) {
-    case 'Conference':
+    case 'Conference 2014':
+      style.icon.fillColor = '#808080';
+      style.icon.strokeColor = '#404040';
+      break;
+    case 'Conference 2015':
       style.icon.fillColor = '#c077f1';
       style.icon.strokeColor = '#a347e1';
       break;
@@ -239,7 +243,7 @@ function handleFeatureClick(event) {
   }
 }
 
-// Respond to change in conference type selectors.
+// Respond to change in type selectors.
 function handleCheckBoxClick(checkBox, type) {
   checkboxes[type] = checkBox.checked;
   // Tell the Data Layer to recompute the style, since checkboxes have changed.
