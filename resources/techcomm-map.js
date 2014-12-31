@@ -148,9 +148,13 @@ function techCommItemStyle(feature) {
       style.icon.fillColor = '#1ab61a';
       style.icon.strokeColor = '#008000';
       break;
-    default:
+    case 'Course':
       style.icon.fillColor = '#017cff';
       style.icon.strokeColor = '#0000ff';
+      break;
+    default:
+      style.icon.fillColor = '#01e2ff';
+      style.icon.strokeColor = '#01c4ff';
   }
   return style;
 }
