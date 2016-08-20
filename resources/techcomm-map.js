@@ -128,7 +128,7 @@ function techCommItemStyle(feature) {
 
   // Set the marker colour based on type of tech comm item.
   switch (type) {
-    case 'Conference 2015':
+    case 'Conference 2017':
       style.icon.fillColor = '#808080';
       style.icon.strokeColor = '#404040';
       break;
