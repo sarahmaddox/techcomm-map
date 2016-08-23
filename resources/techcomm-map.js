@@ -25,11 +25,10 @@ var previousName;
 // This function is called after the page has loaded, to set up the map.
 function initializeMap() {
   map = new google.maps.Map(document.getElementById("map-canvas"), {
-    // Examine the URL parameters for a specified location and zoom, else
-    // use defaults.
-    // TODO: PROPER VALIDATION OF LAT, LNG AND ZOOM.
-    center: ((($.urlParam('lat')) == null) || (($.urlParam('lng')) == null)) ? DEFAULT_CENTER : {lat: +($.urlParam('lat')), lng: +($.urlParam('lng'))}, 
-    zoom: (($.urlParam('zoom')) == null) ? DEFAULT_ZOOM : +($.urlParam('zoom')),
+    // Examine the URL parameters for a specified location and zoom.
+    // If not present or if invalid, use defaults.
+    center: validateLatLng($.urlParam('lat'), $.urlParam('lng')), 
+    zoom: validateZoom($.urlParam('zoom')),
     panControl: false,
     streetViewControl: true,
     streetViewControlOptions: {
@@ -260,15 +259,39 @@ function handleCheckBoxClick(checkBox, type) {
   map.data.setStyle(techCommItemStyle);
 }
 
-// Get values from the URL parameters.
-$.urlParam = function(name){
+// Get values from a URL parameter specified by name.
+$.urlParam = function(name) {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-    if (results==null){
+    if (results == null) {
        return null;
     }
-    else{
+    else {
        return decodeURI(results[1]) || 0;
     }
+}
+
+// Validate the zoom value.
+function validateZoom(zoom) {
+  if ((zoom == null) || isNaN(zoom) || (+zoom < 0)) {
+    return DEFAULT_ZOOM;
+  }
+  else {
+    return +zoom;
+  }
+}
+
+// Validate the latitude and longitude values.
+function validateLatLng(lat, lng) {
+  if ((lat == null) || isNaN(lat) || (+lat < -90) || (+lat > 90)) {
+    return DEFAULT_CENTER;
+  }
+
+  if ((lng == null) || isNaN(lng) || (+lng < -180) || (+lng > 180)) {
+    return DEFAULT_CENTER;
+  }
+
+  var center = {lat: +lat, lng: +lng};
+  return center;
 }
 
 // Load the map.
