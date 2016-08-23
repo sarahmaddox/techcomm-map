@@ -1,8 +1,11 @@
 var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?";
+// DEFAULT-CENTER is the default center of the map, used when first loading
+// the map if there's no location specified in the URL.
 // DEFAULT_ZOOM is the default zoom level for the map.
 // AUTO_ZOOM is the level used when we automatically zoom into a place when
 // the user selects a marker or searches for a place.
 // userZoom holds the zoom value the user has chosen.
+var DEFAULT_CENTER = {lat: 35.55, lng: 16.50};
 var DEFAULT_ZOOM = 2;
 var AUTO_ZOOM = 14;
 var userZoom = DEFAULT_ZOOM;
@@ -22,8 +25,11 @@ var previousName;
 // This function is called after the page has loaded, to set up the map.
 function initializeMap() {
   map = new google.maps.Map(document.getElementById("map-canvas"), {
-    center: {lat: 35.55, lng: 16.50},
-    zoom: DEFAULT_ZOOM,
+    // Examine the URL parameters for a specified location and zoom, else
+    // use defaults.
+    // TODO: PROPER VALIDATION OF LAT, LNG AND ZOOM.
+    center: ((($.urlParam('lat')) == null) || (($.urlParam('lng')) == null)) ? DEFAULT_CENTER : {lat: +($.urlParam('lat')), lng: +($.urlParam('lng'))}, 
+    zoom: (($.urlParam('zoom')) == null) ? DEFAULT_ZOOM : +($.urlParam('zoom')),
     panControl: false,
     streetViewControl: true,
     streetViewControlOptions: {
@@ -252,6 +258,17 @@ function handleCheckBoxClick(checkBox, type) {
   checkboxes[type] = checkBox.checked;
   // Tell the Data Layer to recompute the style, since checkboxes have changed.
   map.data.setStyle(techCommItemStyle);
+}
+
+// Get values from the URL parameters.
+$.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null){
+       return null;
+    }
+    else{
+       return decodeURI(results[1]) || 0;
+    }
 }
 
 // Load the map.
