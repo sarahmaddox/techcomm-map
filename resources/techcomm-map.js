@@ -219,17 +219,18 @@ function createInfoWindow(feature) {
 
   // Offer the option to share a URL containing the location of the event.
   // Just add the div now, in preparation for adding the link later.
-  content.append($('<p class="linked">').text('Copy link'));
+  content.append($('<p class="link-map">').text('Link to location on map'));
 
   // Add the content to the info window, and thus to the DOM.
   infoWindow.setContent(content.html());
-  // Now that the DOM is ready, we can wrap the "linked" div in a link.
-  // First get the latitude and longitude (geometry) object from the event data.
+  // Now that the DOM is ready, we can wrap an HTML link around the divs
+  // that we want linked.
+  // For the map link, get the latitude and longitude (geometry) object from
+  // the event data then add a default zoom.
   var position = feature.getGeometry().get().toJSON();
-  // Add a default zoom.
   $.extend(position, {zoom: AUTO_ZOOM});
   // Put it all together into an HTML link.
-  $('.linked').wrap('<a href="' + TECHCOMM_MAP_URL +
+  $('.link-map').wrap('<a href="' + TECHCOMM_MAP_URL +
       '?' + $.param(position) + '"></a>');
 }
 
