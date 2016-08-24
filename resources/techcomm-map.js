@@ -30,7 +30,6 @@ function initializeMap() {
     // If not present or if invalid, use defaults.
     center: validateLatLng($.urlParam('lat'), $.urlParam('lng')), 
     zoom: validateZoom($.urlParam('zoom')),
-    panControl: false,
     streetViewControl: true,
     streetViewControlOptions: {
       position: google.maps.ControlPosition.LEFT_BOTTOM
