@@ -1,4 +1,5 @@
 var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?";
+var TECHCOMM_MAP_URL = "https://sarahmaddox.github.io/techcomm-map/";
 // DEFAULT-CENTER is the default center of the map, used when first loading
 // the map if there's no location specified in the URL.
 // DEFAULT_ZOOM is the default zoom level for the map.
@@ -216,7 +217,20 @@ function createInfoWindow(feature) {
 
   content.append($('<p>').text(feature.getProperty('address')));
 
+  // Offer the option to share a URL containing the location of the event.
+  // Just add the div now, in preparation for adding the link later.
+  content.append($('<p class="linked">').text('Copy link'));
+
+  // Add the content to the info window, and thus to the DOM.
   infoWindow.setContent(content.html());
+  // Now that the DOM is ready, we can wrap the "linked" div in a link.
+  // First get the latitude and longitude (geometry) object from the event data.
+  var position = feature.getGeometry().get().toJSON();
+  // Add a default zoom.
+  $.extend(position, {zoom: AUTO_ZOOM});
+  // Put it all together into an HTML link.
+  $('.linked').wrap('<a href="' + TECHCOMM_MAP_URL +
+      '?' + $.param(position) + '"></a>');
 }
 
 // On click of marker, show the popup window and zoom in.
@@ -261,7 +275,8 @@ function handleCheckBoxClick(checkBox, type) {
 
 // Get values from a URL parameter specified by name.
 $.urlParam = function(name) {
-    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    var results = new RegExp('[\?&]' + name +
+        '=([^&#]*)').exec(window.location.href);
     if (results == null) {
        return null;
     }
