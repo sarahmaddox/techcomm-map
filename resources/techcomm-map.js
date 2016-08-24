@@ -199,9 +199,13 @@ function createInfoWindow(feature) {
 
   var typeAndWebsite = $('<p>');
   typeAndWebsite.append($('<em>').text(feature.getProperty('type')));
+  // Add the website now, including a class that we'll use to wrap the div
+  // in an HTML link later.
   if (feature.getProperty('website')) {
-    typeAndWebsite.append($('<span>')
-        .text(' (' + feature.getProperty('website') + ')'));
+    typeAndWebsite.append($('<span>').text(' ('));
+    typeAndWebsite.append($('<span class="link-site">')
+        .text(feature.getProperty('website')));
+    typeAndWebsite.append($('<span>').text(') '));
   }
   content.append(typeAndWebsite);
 
@@ -232,6 +236,9 @@ function createInfoWindow(feature) {
   // Put it all together into an HTML link.
   $('.link-map').wrap('<a href="' + TECHCOMM_MAP_URL +
       '?' + $.param(position) + '"></a>');
+  if (feature.getProperty('website')) {
+    $('.link-site').wrap('<a href="' + feature.getProperty('website') + '"></a>');
+  }
 }
 
 // On click of marker, show the popup window and zoom in.
