@@ -1,5 +1,5 @@
-var DATA_SERVICE_URL = "https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?";
-var TECHCOMM_MAP_URL = "https://sarahmaddox.github.io/techcomm-map/";
+var DATA_SERVICE_URL = 'https://script.google.com/macros/s/AKfycbx75GBiRRl9qUyNMCH-BtDbOc4-g0WZSgCnqhvi6YvhCxYpJ1kJ/exec?jsonp=?';
+var TECHCOMM_MAP_URL = 'https://sarahmaddox.github.io/techcomm-map/';
 // DEFAULT-CENTER is the default center of the map, used when first loading
 // the map if there's no location specified in the URL.
 // DEFAULT_ZOOM is the default zoom level for the map.
@@ -30,13 +30,8 @@ function initializeMap() {
     // If not present or if invalid, use defaults.
     center: validateLatLng($.urlParam('lat'), $.urlParam('lng')), 
     zoom: validateZoom($.urlParam('zoom')),
-    streetViewControl: true,
-    streetViewControlOptions: {
-      position: google.maps.ControlPosition.LEFT_BOTTOM
-    },
-    zoomControl: true,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.LEFT_BOTTOM
+    mapTypeControlOptions: {
+      position: google.maps.ControlPosition.TOP_RIGHT
     }
   });
   setEventHandlers();
