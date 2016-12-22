@@ -12,10 +12,7 @@ var AUTO_ZOOM = 14;
 var userZoom = DEFAULT_ZOOM;
 var map;
 var checkboxes = {};
-var infoWindow = new google.maps.InfoWindow({
-  pixelOffset: new google.maps.Size(0, -10),
-  disableAutoPan: true
-});
+var infoWindow;
 // The markerClicked flag indicates whether an info window is open because the
 // user clicked a marker. True means the user clicked a marker. False
 // means the user simply hovered over the marker, or the user has closed the
@@ -34,6 +31,12 @@ function initializeMap() {
       position: google.maps.ControlPosition.TOP_RIGHT
     }
   });
+
+  // Define an info window to show event data.
+  infoWindow = new google.maps.InfoWindow({
+    pixelOffset: new google.maps.Size(0, -10),
+    disableAutoPan: true
+  })
   setEventHandlers();
   // The techCommItemStyle() function computes how each item should be styled.
   // Register it here.
