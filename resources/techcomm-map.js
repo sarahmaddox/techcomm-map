@@ -313,6 +313,3 @@ function validateLatLng(lat, lng) {
   var center = {lat: +lat, lng: +lng};
   return center;
 }
-
-// Load the map.
-google.maps.event.addDomListener(window, 'load', initializeMap);
