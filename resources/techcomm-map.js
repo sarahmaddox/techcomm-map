@@ -135,7 +135,7 @@ function techCommItemStyle(feature) {
       style.icon.fillColor = '#808080';
       style.icon.strokeColor = '#404040';
       break;
-    case 'Conference 2016':
+    case 'Conference 2018':
       style.icon.fillColor = '#c077f1';
       style.icon.strokeColor = '#a347e1';
       break;
