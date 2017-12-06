@@ -23,6 +23,11 @@ html, body, #map-canvas {
   padding: 5px 11px 0px 11px;
 }
 
+#branding img {
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
 #type-selector {
   margin-top: 5px;
   margin-left: 5px;
