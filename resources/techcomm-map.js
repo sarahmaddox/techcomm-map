@@ -88,7 +88,7 @@ function initializeMap() {
   // Get the data from the tech comm spreadsheet, using jQuery's ajax helper.
   $.ajax({
     url: DATA_SERVICE_URL,
-    dataType: 'javascript',
+    dataType: 'jsonp',
     success: function(data) {
       // Get the spreadsheet rows one by one.
       // First row contains headings, so start the index at 1 not 0.
