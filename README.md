@@ -1,12 +1,16 @@
 # Tech Comm on a Map
 
-**Tech Comm on a Map** is an interactive map containing items of information
+> **Update on October 14th, 2018:** Hallo folks, I’ve decided to take down _Tech Comm on a Map_. 
+This means I’ll remove the web page and unpublish the Android app. The web page will remain
+available until the end of November 2018, to give people time to fix up any pages that are using it.
+The Android app will remain installed on your device if you’ve previously installed it, but it won’t
+be available for new installations. My
+[blog post](https://ffeathers.wordpress.com/2018/10/14/shutting-down-tech-comm-on-a-map)
+has more information.
+
+_Tech Comm on a Map_ is an interactive map containing items of information
 that are of interest to technical communicators. See it in action on the
 web: [Tech Comm on a Map](http://sarahmaddox.github.io/techcomm-map/).
-
-It's also available as an Android app.
-
-<a href="https://play.google.com/store/apps/details?id=com.techcomm.map.mobile&amp;utm_source=global_co&amp;utm_medium=prtnr&amp;utm_content=Mar2515&amp;utm_campaign=PartBadge&amp;pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" width="180px" /></a>
 
 For more information about the app and project, see
 this page:
@@ -14,16 +18,10 @@ this page:
 
 ## Contributing
 
-You can update the data on the map (events, tech comm businesses, etc) by filling in the details on
-[this web form](https://docs.google.com/forms/d/1uIEpAu0vpiDwNqwQcr-912TD1_nG_PND9J3NDCPvEXI/viewform?usp=send_form).
-
 To contribute to the code for the **Web app**, please read the LICENSE file in this
 repo. The project is open source and lives on GitHub at
 [https://github.com/sarahmaddox/techcomm-map]. Open an issue or fork the project and submit
 a pull request.
-
-To contribute to the code for the Tech Comm on a Map **on Android**, head on over to the repo for the
-[Android app](https://github.com/sarahmaddox/techcomm-map-android).
 
 ## Copyright
 
