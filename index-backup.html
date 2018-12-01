@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tech Comm on a Map</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+<link href="resources/techcomm-map-styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Include the Google Analytics JavaScript -->
+<script type="text/javascript" src="resources/techcomm-map-ga.js"></script>
+
+<!-- Load jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+  <!-- Search box -->
+  <input id="place-search" type="text"
+  placeholder="Search for a location">
+
+  <!-- Data type selectors -->
+  <div id="type-selector">
+    <input type="checkbox" name="type" id="selecttype-conference17"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Conference 2017')">
+    <label for="selecttype-conference17">Conferences 2017</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-conference18"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Conference 2018')">
+    <label for="selecttype-conference18">Conferences 2018</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-society"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Society')">
+    <label for="selecttype-society">Societies</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-group"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Group')">
+    <label for="selecttype-group">Groups</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-business"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Business')">
+    <label for="selecttype-business">Businesses</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-course"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Course')">
+    <label for="selecttype-course">Courses</label>
+    <br>
+    <input type="checkbox" name="type" id="selecttype-other"
+      checked="checked" onclick="handleCheckBoxClick(this, 'Other')">
+    <label for="selecttype-other">Other</label>
+  </div>
+
+  <div id = "branding">
+    <span>Tech Comm on a Map
+      <a href="http://ffeathers.wordpress.com/tech-comm-on-a-map/"><img
+          src="resources/icons/ic_info.png"
+          width=10%
+          alt="info"
+          title="About this app"></a>
+      <a href="https://docs.google.com/forms/d/1uIEpAu0vpiDwNqwQcr-912TD1_nG_PND9J3NDCPvEXI/viewform?usp=send_form"><img
+          src="resources/icons/ic_add.png"
+          width=10%
+          alt="add"
+          title="Add an item to the map"></a>
+     </span>
+  </div>
+
+  <!-- Map -->
+  <div id="map-canvas"></div>
+
+  <!-- Set up the map and UI controls -->
+  <script src="resources/techcomm-map.js" charset="utf-8"></script>
+
+  <!-- Load the Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwWekcCNrI7bXKrGY4kOUWQjQGImf2lzc&libraries=places&callback=initializeMap"
+    async defer></script>
+</body>
+</html>
